@@ -1,0 +1,171 @@
+BEGIN
+    LOCAL MODE,KEY,FILE,COL:=[0,3],PEN,NOW:=[0,0];
+    LOCAL BOX,CIR,CO,ING,LIN,P1:=[0,0];
+    CHOOSE(MODE,"画图gII","新建","编辑");
+    IF MODE==0 THEN
+        KILL;
+    END;
+    1►R;
+    RECT_P(0,0,255,126,3,3);
+    LINE_P(0,111,255,111);
+    FOR I FROM 0 TO 5 DO
+        LINE_P(I*42,111,I*42,126);
+    END;
+    LINE_P(255,111,255,126);
+    TEXTOUT_P("笔",15,114,1);
+    TEXTOUT_P("直线",52,114,1);
+    TEXTOUT_P("圆",100,114,1);
+    TEXTOUT_P("矩形",136,114,1);
+    RECT_P(212,113,250,126,0,0);
+    INVERT_P(0,111,255,126);
+    IF MODE==1 THEN
+        DIMGROB_P(G1,256,110);
+    END;
+    IF MODE==2 THEN
+        BLIT_P(G0,G1);
+    END;
+    SUBGROB_P(G0,0,0,256,110,G1);
+    −1►KEY;
+    1►CO;
+    REPEAT
+        IF KEY==4 THEN 1►CO; END;
+        IF KEY==5 THEN 2►CO; END;
+        IF KEY==42 THEN 1►COL(CO); END;
+        IF KEY==43 THEN 2►COL(CO); END;
+        IF KEY==44 THEN 3►COL(CO); END;
+        IF KEY==47 THEN 0►COL(CO); END;
+        FOR I FROM 1 TO 2 DO
+            RECT_P(128+42*I,113,166+42*I,126,COL(I),COL(I));
+        END;
+        FOR I FROM 0 TO 3 DO
+            LINE_P(128+42*CO,123+I,166+42*CO,123+I,I);
+        END;
+        IF KEY==1 THEN
+            IF PEN==1 THEN
+                INVERT_P(2,113,40,126);
+                0►PEN;
+            END;
+            IF CIR==1 THEN
+                INVERT_P(86,113,124,126);
+                0►CIR;
+            END;
+            IF BOX==1 THEN
+                INVERT_P(128,113,166,126);
+                0►BOX;
+            END;
+            1-LIN►LIN;
+            0►ING;
+            INVERT_P(44,113,82,126);
+        END;
+        IF KEY==0 THEN
+            IF CIR==1 THEN
+                INVERT_P(86,113,124,126);
+                0►CIR;
+                0►ING;
+            END;
+            IF BOX==1 THEN
+                INVERT_P(128,113,166,126);
+                0►BOX;
+                0►ING;
+            END;
+            IF LIN==1 THEN
+                INVERT_P(44,113,82,126);
+                0►LIN;
+                0►ING;
+            END;
+            1-PEN►PEN;
+            INVERT_P(2,113,40,126);
+        END;
+        IF KEY==2 THEN
+            IF PEN==1 THEN
+                INVERT_P(2,113,40,126);
+                0►PEN;
+            END;
+            IF BOX==1 THEN
+                INVERT_P(128,113,166,126);
+                0►BOX;
+            END;
+            IF LIN==1 THEN
+                INVERT_P(44,113,82,126);
+                0►LIN;
+            END;
+            1-CIR►CIR;
+            0►ING;
+            INVERT_P(86,113,124,126);
+        END;
+        IF KEY==3 THEN
+            IF PEN==1 THEN
+                INVERT_P(2,113,40,126);
+                0►PEN;
+            END;
+            IF CIR==1 THEN
+                INVERT_P(86,113,124,126);
+                0►CIR;
+            END;
+            IF LIN==1 THEN
+                INVERT_P(44,113,82,126);
+                0►LIN;
+            END;
+            1-BOX►BOX;
+            0►ING;
+            INVERT_P(128,113,166,126);
+        END;
+        IF PEN THEN
+            PIXON_P(G1,NOW(1),NOW(2),COL(CO));
+        END;
+        IF KEY==50 THEN
+            IF ING THEN
+                IF LIN THEN
+                    LINE_P(G1,P1(1),P1(2),NOW(1),NOW(2),COL(CO));
+                    0►ING;
+                END;
+                IF BOX THEN
+                    RECT_P(G1,P1(1),P1(2),NOW(1),NOW(2),COL(1),COL(2));
+                    0►ING;
+                END;
+                IF CIR THEN
+                    ARC_P(G1,P1(1),P1(2),√((NOW(1)-P1(1))²+(NOW(2)-P1(2))²),0,359,COL(CO));
+                    0►ING;
+                END;
+            END;
+            IF ING==0 THEN
+                NOW(1)►P1(1);
+                NOW(2)►P1(2);
+                1►ING;
+            END;
+        END;
+        BLIT_P(G0,G1);
+        IF KEY==3 THEN 1;
+            BLIT_P(G0,G1); END;
+        IF ING THEN
+            IF LIN THEN
+                LINE_P(P1(1),P1(2),NOW(1),NOW(2),COL(CO));
+            END;
+            IF BOX THEN
+                RECT_P(P1(1),P1(2),NOW(1),NOW(2),COL(1),COL(2));
+            END;
+            IF CIR THEN
+                ARC_P(G0,P1(1),P1(2),√((NOW(1)-P1(1))²+(NOW(2)-P1(2))²),0,359,COL(CO));
+            END;
+        END;
+        LINE_P(NOW(1)-2,NOW(2),NOW(1)+2,NOW(2));
+        LINE_P(NOW(1),NOW(2)-2,NOW(1),NOW(2)+2);
+        RECT_P(0,110,255,111);
+        REPEAT
+            GETKEY►KEY;
+        UNTIL KEY≠−1 OR ISKEYDOWN(41);
+        //D-Pad
+        IF (KEY==9 OR (ISKEYDOWN(41) AND ISKEYDOWN(9))) AND NOW(2)>0 THEN
+            NOW(2)-1►NOW(2);
+        END;
+        IF (KEY==15 OR (ISKEYDOWN(41) AND ISKEYDOWN(15))) AND NOW(2)<109 THEN
+            NOW(2)+1►NOW(2);
+        END;
+        IF (KEY==10 OR (ISKEYDOWN(41) AND ISKEYDOWN(10))) AND NOW(1)<255 THEN
+            NOW(1)+1►NOW(1);
+        END;
+        IF (KEY==14 OR (ISKEYDOWN(41) AND ISKEYDOWN(14))) AND NOW(1)>0 THEN
+            NOW(1)-1►NOW(1);
+        END;
+    UNTIL 0;
+END;

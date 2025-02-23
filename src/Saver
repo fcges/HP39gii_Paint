@@ -1,0 +1,34 @@
+BEGIN
+    LOCAL NUM,PG,TEMP:="",TB:="";
+    RECT_P(0,0,255,126,3,3);
+    RECT_P(20,55,235,65,0,3);
+    FOR I FROM 0 TO 109 DO
+        FOR J FROM 1 TO 51 DO
+            FOR K FROM 1 TO 5 DO
+                TB+L0(GETPIX_P(G1,J*5+K-6,I)+1)►TB;
+            END;
+            FOR K FROM 1 TO 10 DO
+                expr(mid(TB,K,1))*2^(10-K)+NUM►NUM;
+            END;
+            TEMP+char(NUM+19968)►TEMP;
+            0►NUM;
+            ""►TB;
+            PG+1►PG;
+            RECT_P(20,55,20+215*(PG/5610),65,0,0);
+        END;
+        TEMP►L2(I+1);
+        ""►TEMP;
+    END;
+    FOR I FROM 1 TO 22 DO
+        FOR J FROM 1 TO 5 DO
+            TB+L0(GETPIX_P(G1,255,I*5+J-6)+1)►TB;
+        END;
+        FOR K FROM 1 TO 10 DO
+            expr(mid(TB,K,1))*2^(10-K)+NUM►NUM;
+        END;
+        TEMP+char(NUM+19968)►TEMP;
+        ""►TB;
+        0►NUM;
+    END;
+    TEMP►L2(111);
+END;
